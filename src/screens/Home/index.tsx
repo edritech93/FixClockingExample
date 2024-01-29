@@ -1,10 +1,41 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {
+  getPermissionCamera,
+  getPermissionReadStorage,
+  getPermissionWriteStorage,
+} from '../../libs/permission';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackType} from '../../types/RootStackType';
+import {Button} from 'react-native-paper';
 
-export default function Home() {
+interface IHome extends NativeStackScreenProps<RootStackType, 'Home'> {}
+
+export default function Home(props: IHome) {
+  const {navigation} = props;
+
+  useEffect(() => {
+    async function _getPermission() {
+      await getPermissionCamera().catch((error: Error) => {
+        console.log(error);
+        return;
+      });
+      await getPermissionReadStorage().catch((error: Error) => {
+        console.log(error);
+        return;
+      });
+      await getPermissionWriteStorage().catch((error: Error) => {
+        console.log(error);
+        return;
+      });
+    }
+    _getPermission();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text>Home</Text>
+      <Button onPress={() => navigation.push('Clocking')}>Test Clocking</Button>
     </View>
   );
 }
