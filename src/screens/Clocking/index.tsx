@@ -1,12 +1,5 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {Dimensions, Image, ScrollView, StyleSheet, View} from 'react-native';
 import {
   Camera,
   useFrameProcessor,
@@ -18,6 +11,7 @@ import {
 } from 'react-native-vision-camera';
 import {
   scanFaces,
+  detectFromBase64,
   type FaceBoundType,
   type FaceType,
 } from 'vision-camera-face-detection';
@@ -42,7 +36,7 @@ const targetFps = 30;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState<boolean>(false);
-  const [tensorSample, setTensorSample] = useState<number[]>([]);
+  // const [tensorSample, setTensorSample] = useState<number[]>([]);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
   const [dataCamera, setDataCamera] = useState<string | null>(null);
 
@@ -187,12 +181,30 @@ export default function App() {
       result.assets[0]?.base64 &&
       model
     ) {
-      const array: Float32Array = new Float32Array(
-        [...atob(result.assets[0].base64)].map((c: string, i: number) =>
-          c.charCodeAt(i),
-        ),
+      const dataFace = await detectFromBase64(result.assets[0].base64).catch(
+        (error: Error) => {
+          console.log(error);
+          return;
+        },
       );
-      const output = model.runSync([array] as any[]);
+      console.log(dataFace);
+      const blob = atob(result.assets[0].base64);
+      const fLen = blob.length / Float32Array.BYTES_PER_ELEMENT;
+      const dView = new DataView(
+        new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
+      );
+      let array = new Float32Array(fLen);
+      let p = 0;
+      for (let j = 0; j < fLen; j++) {
+        p = j * 4;
+        dView.setUint8(0, blob.charCodeAt(p));
+        dView.setUint8(1, blob.charCodeAt(p + 1));
+        dView.setUint8(2, blob.charCodeAt(p + 2));
+        dView.setUint8(3, blob.charCodeAt(p + 3));
+        array[j] = dView.getFloat32(0, true);
+      }
+      // console.log(array.length);
+      const output = model.runSync([array] as any);
       console.log('Result: ', output.toString());
     }
   };
@@ -215,7 +227,10 @@ export default function App() {
           source={{uri: dataCamera}}
           resizeMode={'contain'}
         />
-        <Button style={styles.btnClose} onPress={() => setDataCamera(null)}>
+        <Button
+          mode={'contained'}
+          style={styles.btnClose}
+          onPress={() => setDataCamera(null)}>
           Remove
         </Button>
       </View>
@@ -246,9 +261,15 @@ export default function App() {
         />
         <Animated.View style={faceAnimStyle} />
         <View style={styles.wrapBottom}>
-          <Button onPress={_onOpenImage}>Open Image</Button>
-          <Button onPress={_onPressTake}>Take Photo</Button>
-          <Button onPress={() => setTensorFace([])}>Clear Data</Button>
+          <Button mode={'contained'} onPress={_onOpenImage}>
+            Open Image
+          </Button>
+          <Button mode={'contained'} onPress={_onPressTake}>
+            Take Photo
+          </Button>
+          <Button mode={'contained'} onPress={() => setTensorFace([])}>
+            Clear Data
+          </Button>
         </View>
         <ScrollView>
           <Text style={styles.textResult}>{`Result: ${JSON.stringify(
@@ -280,6 +301,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
+    gap: 16,
   },
   imgPreview: {
     width: SCREEN_WIDTH,
