@@ -20,12 +20,12 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import {getPermissionReadStorage} from '../../libs/permission';
 import {Worklets, useSharedValue} from 'react-native-worklets-core';
+import {ActivityIndicator, Button, Text} from 'react-native-paper';
+import {getPermissionReadStorage} from '../../libs/permission';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
-import {ActivityIndicator, Button, Text} from 'react-native-paper';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -121,6 +121,7 @@ export default function App() {
           dataType: 'float32',
         });
         const array: Float32Array = new Float32Array(data);
+        console.log(array.length);
         const output = model.runSync([array] as any[]);
         console.log('Result: ', output);
 
@@ -195,7 +196,7 @@ export default function App() {
       const dView = new DataView(
         new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
       );
-      let array = new Float32Array(fLen);
+      let array: Float32Array = new Float32Array(fLen);
       let p = 0;
       for (let j = 0; j < fLen; j++) {
         p = j * 4;
@@ -205,9 +206,9 @@ export default function App() {
         dView.setUint8(3, blob.charCodeAt(p + 3));
         array[j] = dView.getFloat32(0, true);
       }
-      // console.log(array.length);
-      const output = model.runSync([array] as any);
-      console.log('Result: ', output.toString());
+      console.log(array.length);
+      // const output = model.runSync([array] as any);
+      // console.log('Result: ', output.toString());
     }
   };
 
