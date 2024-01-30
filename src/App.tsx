@@ -1,11 +1,14 @@
 import React from 'react';
 import {StyleSheet, SafeAreaView} from 'react-native';
+import {PaperProvider} from 'react-native-paper';
 import StackNavigation from './Router';
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
-      <StackNavigation />
+      <PaperProvider>
+        <StackNavigation />
+      </PaperProvider>
     </SafeAreaView>
   );
 }

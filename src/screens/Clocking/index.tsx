@@ -31,7 +31,7 @@ import {Worklets, useSharedValue} from 'react-native-worklets-core';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
-import {Button, Text} from 'react-native-paper';
+import {ActivityIndicator, Button, Text} from 'react-native-paper';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -42,7 +42,8 @@ const targetFps = 30;
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState<boolean>(false);
-  const [arrayTensor, setArrayTensor] = useState<number[]>([]);
+  const [tensorSample, setTensorSample] = useState<number[]>([]);
+  const [tensorFace, setTensorFace] = useState<number[]>([]);
   const [dataCamera, setDataCamera] = useState<string | null>(null);
 
   const camera = useRef<Camera>(null);
@@ -84,6 +85,14 @@ export default function App() {
   //   faceString.value = image;
   // });
 
+  useEffect(() => {
+    async function _getPermission() {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+    }
+    _getPermission();
+  }, []);
+
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
       'worklet';
@@ -91,39 +100,47 @@ export default function App() {
       const dataFace: FaceType = scanFaces(frame);
       // console.log('dataFace => ', dataFace);
       // NOTE: handle face detection
-      if (dataFace) {
-        if (dataFace.bounds && model) {
-          const {width: frameWidth, height: frameHeight} = frame;
-          const xFactor = SCREEN_WIDTH / frameWidth;
-          const yFactor = SCREEN_HEIGHT / frameHeight;
-          const bounds: FaceBoundType = dataFace.bounds;
-          rectWidth.value = bounds.width * xFactor;
-          rectHeight.value = bounds.height * yFactor;
-          rectX.value = bounds.x * xFactor;
-          rectY.value = bounds.y * yFactor;
-          updateRect({
-            width: rectWidth.value,
-            height: rectHeight.value,
+      if (model && dataFace && dataFace.bounds) {
+        const {width: frameWidth, height: frameHeight} = frame;
+        const xFactor = SCREEN_WIDTH / frameWidth;
+        const yFactor = SCREEN_HEIGHT / frameHeight;
+        const bounds: FaceBoundType = dataFace.bounds;
+        rectWidth.value = bounds.width * xFactor;
+        rectHeight.value = bounds.height * yFactor;
+        rectX.value = bounds.x * xFactor;
+        rectY.value = bounds.y * yFactor;
+        updateRect({
+          width: rectWidth.value,
+          height: rectHeight.value,
+          x: rectX.value,
+          y: rectY.value,
+        });
+        // NOTE: handle resize frame
+        const data = resize(frame, {
+          size: {
             x: rectX.value,
             y: rectY.value,
-          });
-          // NOTE: handle resize frame
-          const data = resize(frame, {
-            size: {
-              x: rectX.value,
-              y: rectY.value,
-              width: 112,
-              height: 112,
-            },
-            pixelFormat: 'rgb',
-            dataType: 'float32',
-          });
-          const array: Float32Array = new Float32Array(data);
-          const output = model.runSync([array] as any[]);
-          console.log('Result: ', output.toString());
-          const end = performance.now();
-          console.log(`Performance: ${end - start}ms`);
-        }
+            width: 112,
+            height: 112,
+          },
+          pixelFormat: 'rgb',
+          dataType: 'float32',
+        });
+        const array: Float32Array = new Float32Array(data);
+        const output = model.runSync([array] as any[]);
+        console.log('Result: ', output);
+
+        // for (let index = 0; index < output.length; index++) {
+        //   const knownEmb = output[index];
+        //   let distance = 0.0;
+        //   for (let i = 0; i < faceTensor.length; i++) {
+        //     const diff = faceTensor[i] - knownEmb[i];
+        //     distance += diff * diff;
+        //   }
+        //   console.log('distance => ', distance);
+        // }
+        const end = performance.now();
+        console.log(`Performance: ${end - start}ms`);
       }
     },
     [model],
@@ -142,14 +159,6 @@ export default function App() {
     };
   });
 
-  useEffect(() => {
-    async function _getPermission() {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'granted');
-    }
-    _getPermission();
-  }, []);
-
   const onError = useCallback((error: CameraRuntimeError) => {
     console.error(error);
   }, []);
@@ -166,16 +175,25 @@ export default function App() {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       includeBase64: true,
+    }).catch(error => {
+      console.log(error);
+      return;
     });
     if (
       result &&
       result.assets &&
       result.assets.length > 0 &&
-      result.assets[0]?.uri
+      result.assets[0]?.uri &&
+      result.assets[0]?.base64 &&
+      model
     ) {
-      // result.assets[0].base64
-      // const output = model.runSync([array] as any[]);
-      // console.log('Result: ', output.toString());
+      const array: Float32Array = new Float32Array(
+        [...atob(result.assets[0].base64)].map((c: string, i: number) =>
+          c.charCodeAt(i),
+        ),
+      );
+      const output = model.runSync([array] as any[]);
+      console.log('Result: ', output.toString());
     }
   };
 
@@ -191,7 +209,7 @@ export default function App() {
 
   if (dataCamera) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <Image
           style={styles.imgPreview}
           source={{uri: dataCamera}}
@@ -200,12 +218,12 @@ export default function App() {
         <Button style={styles.btnClose} onPress={() => setDataCamera(null)}>
           Remove
         </Button>
-      </SafeAreaView>
+      </View>
     );
   } else if (device != null && format != null && hasPermission) {
     const pixelFormat = format.pixelFormats.includes('yuv') ? 'yuv' : 'native';
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <Camera
           ref={camera}
           style={StyleSheet.absoluteFill}
@@ -230,23 +248,29 @@ export default function App() {
         <View style={styles.wrapBottom}>
           <Button onPress={_onOpenImage}>Open Image</Button>
           <Button onPress={_onPressTake}>Take Photo</Button>
-          <Button onPress={() => setArrayTensor([])}>Clear Data</Button>
+          <Button onPress={() => setTensorFace([])}>Clear Data</Button>
         </View>
         <ScrollView>
           <Text style={styles.textResult}>{`Result: ${JSON.stringify(
-            arrayTensor,
+            tensorFace,
           )}`}</Text>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     );
   } else {
-    return null;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator />
+      </View>
+    );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textResult: {
     color: 'black',

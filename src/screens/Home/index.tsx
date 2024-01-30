@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {
   getPermissionCamera,
   getPermissionReadStorage,
@@ -34,8 +34,9 @@ export default function Home(props: IHome) {
 
   return (
     <View style={styles.container}>
-      <Text>Home</Text>
-      <Button onPress={() => navigation.push('Clocking')}>Test Clocking</Button>
+      <Button mode={'contained'} onPress={() => navigation.push('Clocking')}>
+        Test Clocking
+      </Button>
     </View>
   );
 }
