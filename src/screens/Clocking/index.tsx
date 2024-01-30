@@ -181,14 +181,16 @@ export default function App() {
       result.assets[0]?.base64 &&
       model
     ) {
-      const dataFace = await detectFromBase64(result.assets[0].base64).catch(
+      const base64Face = await detectFromBase64(result.assets[0].base64).catch(
         (error: Error) => {
           console.log(error);
           return;
         },
       );
-      console.log(dataFace);
-      const blob = atob(result.assets[0].base64);
+      if (!base64Face) {
+        return;
+      }
+      const blob = atob(base64Face);
       const fLen = blob.length / Float32Array.BYTES_PER_ELEMENT;
       const dView = new DataView(
         new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
