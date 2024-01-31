@@ -36,6 +36,7 @@ const enableNightMode = false;
 const targetFps = 30;
 
 export default function App() {
+  const [faceBase64, setFaceBase64] = useState('');
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   // const [tensorSample, setTensorSample] = useState<number[]>([]);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
@@ -111,7 +112,7 @@ export default function App() {
           y: rectY.value,
         });
         // NOTE: handle resize frame
-        const data = resize(frame, {
+        const arrayBuffer = resize(frame, {
           size: {
             x: rectX.value,
             y: rectY.value,
@@ -121,10 +122,11 @@ export default function App() {
           pixelFormat: 'rgb',
           dataType: 'float32',
         });
-        const array: Float32Array = new Float32Array(data);
-        console.log(array.length);
-        const output = model.runSync([array] as any[]);
-        console.log('Result: ', output);
+        console.log('arrayBuffer => ', arrayBuffer.byteLength);
+        const array: Float32Array = new Float32Array(arrayBuffer);
+        console.log('array => ', array.length);
+        // const output = model.runSync([array] as any[]);
+        // console.log('Result: ', output.length);
 
         // for (let index = 0; index < output.length; index++) {
         //   const knownEmb = output[index];
@@ -192,11 +194,13 @@ export default function App() {
       if (!base64Face) {
         return;
       }
+      setFaceBase64(base64Face);
       const arrayBuffer: ArrayBuffer = decode(base64Face);
-      const array = new Float32Array(arrayBuffer);
-      console.log(array);
+      console.log('arrayBuffer => ', arrayBuffer.byteLength);
+      const array: Float32Array = new Float32Array(arrayBuffer);
+      console.log('array => ', array.length);
       // const output = model.runSync([array] as any);
-      // console.log('Result: ', output.toString());
+      // console.log('Result: ', output.length);
     }
   };
 
@@ -262,6 +266,12 @@ export default function App() {
             Clear Data
           </Button>
         </View>
+        {faceBase64.length > 0 && (
+          <Image
+            source={{uri: `data:image/png;base64,${faceBase64}`}}
+            style={styles.imgFace}
+          />
+        )}
         <ScrollView>
           <Text style={styles.textResult}>{`Result: ${JSON.stringify(
             tensorFace,
@@ -300,4 +310,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   btnClose: {},
+  imgFace: {
+    height: 112,
+    width: 112,
+  },
 });
