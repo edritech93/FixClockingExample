@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Haermes3Fix.app"
-               BlueprintName = "Haermes3Fix"
-               ReferencedContainer = "container:Haermes3Fix.xcodeproj">
+               BuildableName = "FixClockingExample.app"
+               BlueprintName = "FixClockingExample"
+               ReferencedContainer = "container:FixClockingExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "Haermes3FixTests.xctest"
-               BlueprintName = "Haermes3FixTests"
-               ReferencedContainer = "container:Haermes3Fix.xcodeproj">
+               BuildableName = "FixClockingExampleTests.xctest"
+               BlueprintName = "FixClockingExampleTests"
+               ReferencedContainer = "container:FixClockingExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Haermes3Fix.app"
-            BlueprintName = "Haermes3Fix"
-            ReferencedContainer = "container:Haermes3Fix.xcodeproj">
+            BuildableName = "FixClockingExample.app"
+            BlueprintName = "FixClockingExample"
+            ReferencedContainer = "container:FixClockingExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Haermes3Fix.app"
-            BlueprintName = "Haermes3Fix"
-            ReferencedContainer = "container:Haermes3Fix.xcodeproj">
+            BuildableName = "FixClockingExample.app"
+            BlueprintName = "FixClockingExample"
+            ReferencedContainer = "container:FixClockingExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
