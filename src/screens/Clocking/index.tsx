@@ -26,6 +26,7 @@ import {getPermissionReadStorage} from '../../libs/permission';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
+import {decode} from 'base64-arraybuffer';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -191,22 +192,9 @@ export default function App() {
       if (!base64Face) {
         return;
       }
-      const blob = atob(base64Face);
-      const fLen = blob.length / Float32Array.BYTES_PER_ELEMENT;
-      const dView = new DataView(
-        new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
-      );
-      let array: Float32Array = new Float32Array(fLen);
-      let p = 0;
-      for (let j = 0; j < fLen; j++) {
-        p = j * 4;
-        dView.setUint8(0, blob.charCodeAt(p));
-        dView.setUint8(1, blob.charCodeAt(p + 1));
-        dView.setUint8(2, blob.charCodeAt(p + 2));
-        dView.setUint8(3, blob.charCodeAt(p + 3));
-        array[j] = dView.getFloat32(0, true);
-      }
-      console.log(array.length);
+      const arrayBuffer: ArrayBuffer = decode(base64Face);
+      const array = new Float32Array(arrayBuffer);
+      console.log(array);
       // const output = model.runSync([array] as any);
       // console.log('Result: ', output.toString());
     }
