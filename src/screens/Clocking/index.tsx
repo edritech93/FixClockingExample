@@ -26,7 +26,6 @@ import {getPermissionReadStorage} from '../../libs/permission';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
-import {decode} from 'base64-arraybuffer';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -34,7 +33,7 @@ const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH;
 const enableHdr = false;
 const enableNightMode = false;
 const targetFps = 30;
-var lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
+const lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
 
 export default function App() {
   const [faceBase64, setFaceBase64] = useState('');
@@ -123,11 +122,11 @@ export default function App() {
           pixelFormat: 'rgb',
           dataType: 'float32',
         });
-        console.log('arrayBuffer => ', arrayBuffer.byteLength);
+        // console.log('arrayBuffer => ', arrayBuffer.byteLength);
         const array: Float32Array = new Float32Array(arrayBuffer);
-        console.log('array => ', array.length);
-        // const output = model.runSync([array] as any[]);
-        // console.log('Result: ', output.length);
+        // console.log('array => ', array.length);
+        const output = model.runSync([array] as any[]);
+        console.log('Result: ', output.length);
 
         // for (let index = 0; index < output.length; index++) {
         //   const knownEmb = output[index];
@@ -198,9 +197,6 @@ export default function App() {
       setFaceBase64(base64Face);
       const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
       console.log('arrayBuffer => ', arrayBuffer.byteLength);
-      // const buffFloat = resizeBuffer(arrayBuffer);
-      // var oldBuffer = new ArrayBuffer(20);
-      // var newBuffer = new ArrayBuffer(150528);
       const array: Float32Array = new Float32Array(arrayBuffer);
       console.log('array => ', array.length);
       const output = model.runSync([array] as any);
@@ -208,37 +204,12 @@ export default function App() {
     }
   };
 
-  // function resizeBuffer(buff: ArrayBuffer) {
-  //   // console.log('buff1 => ', buff.byteLength);
-  //   // let newBuff: ArrayBuffer = new ArrayBuffer(150528);
-  //   // for (let i = 0; i < buff.byteLength; i++) {
-  //   //   newBuff[i] = buff[i];
-  //   // }
-  //   // buff = newBuff;
-  //   // console.log('buff2 => ', buff.byteLength);
-  //   // return buff;
-
-  //   var oldBuffer = new ArrayBuffer(20);
-
-  //   var newBuffer = new ArrayBuffer(40);
-  //   new Float32Array(newBuffer).set(oldBuffer);
-  // }
-
   function decodeBase64(base64: string) {
-    var bufferLength = base64.length * 0.75;
-    const len = base64.length;
-    let i;
     let p = 0;
     let encoded1, encoded2, encoded3, encoded4;
-    if (base64[base64.length - 1] === '=') {
-      bufferLength--;
-      if (base64[base64.length - 2] === '=') {
-        bufferLength--;
-      }
-    }
-    var arraybuffer = new ArrayBuffer(150528),
-      bytes = new Uint8Array(arraybuffer);
-    for (i = 0; i < len; i += 4) {
+    const arraybuffer = new ArrayBuffer(150528);
+    let bytes = new Uint8Array(arraybuffer);
+    for (let i = 0; i < base64.length; i += 4) {
       encoded1 = lookup[base64.charCodeAt(i)];
       encoded2 = lookup[base64.charCodeAt(i + 1)];
       encoded3 = lookup[base64.charCodeAt(i + 2)];
