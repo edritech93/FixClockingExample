@@ -11,7 +11,6 @@ import {
 } from 'react-native-vision-camera';
 import {
   scanFaces,
-  detectFromBase64,
   type FaceBoundType,
   type FaceType,
 } from 'vision-camera-face-detection';
@@ -22,10 +21,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import {Worklets, useSharedValue} from 'react-native-worklets-core';
 import {ActivityIndicator, Button, Text} from 'react-native-paper';
-import {getPermissionReadStorage} from '../../libs/permission';
-import {launchImageLibrary} from 'react-native-image-picker';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackType} from '../../types/RootStackType';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -33,12 +32,13 @@ const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH;
 const enableHdr = false;
 const enableNightMode = false;
 const targetFps = 30;
-const lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
 
-export default function App() {
-  const [faceBase64, setFaceBase64] = useState('');
+interface IClocking extends NativeStackScreenProps<RootStackType, 'Clocking'> {}
+
+export default function Clocking(props: IClocking) {
+  const {tensorSample} = props.route.params;
+
   const [hasPermission, setHasPermission] = useState<boolean>(false);
-  // const [tensorSample, setTensorSample] = useState<number[]>([]);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
   const [dataCamera, setDataCamera] = useState<string | null>(null);
 
@@ -92,7 +92,7 @@ export default function App() {
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
       'worklet';
-      const start = performance.now();
+      // const start = performance.now();
       const dataFace: FaceType = scanFaces(frame);
       // console.log('dataFace => ', dataFace);
       // NOTE: handle face detection
@@ -126,19 +126,25 @@ export default function App() {
         const array: Float32Array = new Float32Array(arrayBuffer);
         // console.log('array => ', array.length);
         const output = model.runSync([array] as any[]);
-        console.log('Result: ', output.length);
-
-        // for (let index = 0; index < output.length; index++) {
-        //   const knownEmb = output[index];
-        //   let distance = 0.0;
-        //   for (let i = 0; i < faceTensor.length; i++) {
-        //     const diff = faceTensor[i] - knownEmb[i];
-        //     distance += diff * diff;
-        //   }
-        //   console.log('distance => ', distance);
-        // }
-        const end = performance.now();
-        console.log(`Performance: ${end - start}ms`);
+        const arrayTensor = output[0];
+        // console.log(arrayTensor);
+        for (let index = 0; index < arrayTensor.byteLength; index++) {
+          const knownEmb = output[index];
+          let distance = 0.0;
+          for (let i = 0; i < tensorSample.byteLength; i++) {
+            const diff = tensorSample[i] - knownEmb[i];
+            distance += diff * diff;
+          }
+          console.log('tensorSample => ', tensorSample.length);
+          // console.log('arrayTensor => ', arrayTensor.byteLength);
+          // console.log(
+          //   new Date().toLocaleTimeString(),
+          //   ' distance => ',
+          //   distance,
+          // );
+        }
+        // const end = performance.now();
+        // console.log(`Performance: ${end - start}ms`);
       }
     },
     [model],
@@ -164,62 +170,6 @@ export default function App() {
   const onInitialized = useCallback(() => {
     console.log('Camera initialized!');
   }, []);
-
-  const _onOpenImage = async () => {
-    await getPermissionReadStorage().catch((error: Error) => {
-      console.log(error);
-      return;
-    });
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      includeBase64: true,
-    }).catch(error => {
-      console.log(error);
-      return;
-    });
-    if (
-      result &&
-      result.assets &&
-      result.assets.length > 0 &&
-      result.assets[0]?.uri &&
-      result.assets[0]?.base64 &&
-      model
-    ) {
-      const base64Face = await detectFromBase64(result.assets[0].base64).catch(
-        (error: Error) => {
-          console.log(error);
-          return;
-        },
-      );
-      if (!base64Face) {
-        return;
-      }
-      setFaceBase64(base64Face);
-      const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
-      console.log('arrayBuffer => ', arrayBuffer.byteLength);
-      const array: Float32Array = new Float32Array(arrayBuffer);
-      console.log('array => ', array.length);
-      const output = model.runSync([array] as any);
-      console.log('Result: ', output.length);
-    }
-  };
-
-  function decodeBase64(base64: string) {
-    let p = 0;
-    let encoded1, encoded2, encoded3, encoded4;
-    const arraybuffer = new ArrayBuffer(150528);
-    let bytes = new Uint8Array(arraybuffer);
-    for (let i = 0; i < base64.length; i += 4) {
-      encoded1 = lookup[base64.charCodeAt(i)];
-      encoded2 = lookup[base64.charCodeAt(i + 1)];
-      encoded3 = lookup[base64.charCodeAt(i + 2)];
-      encoded4 = lookup[base64.charCodeAt(i + 3)];
-      bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
-      bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
-      bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
-    }
-    return arraybuffer;
-  }
 
   const _onPressTake = async () => {
     if (camera.current && !dataCamera) {
@@ -273,9 +223,6 @@ export default function App() {
         />
         <Animated.View style={faceAnimStyle} />
         <View style={styles.wrapBottom}>
-          <Button mode={'contained'} onPress={_onOpenImage}>
-            Open Image
-          </Button>
           <Button mode={'contained'} onPress={_onPressTake}>
             Take Photo
           </Button>
@@ -283,12 +230,6 @@ export default function App() {
             Clear Data
           </Button>
         </View>
-        {faceBase64.length > 0 && (
-          <Image
-            source={{uri: `data:image/png;base64,${faceBase64}`}}
-            style={styles.imgFace}
-          />
-        )}
         <ScrollView>
           <Text style={styles.textResult}>{`Result: ${JSON.stringify(
             tensorFace,
@@ -327,8 +268,4 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   btnClose: {},
-  imgFace: {
-    height: 112,
-    width: 112,
-  },
 });

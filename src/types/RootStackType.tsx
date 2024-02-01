@@ -1,4 +1,6 @@
 export type RootStackType = {
   Home: undefined;
-  Clocking: undefined;
+  Clocking: {
+    tensorSample: any;
+  };
 };
