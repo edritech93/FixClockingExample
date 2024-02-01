@@ -37,6 +37,7 @@ interface IClocking extends NativeStackScreenProps<RootStackType, 'Clocking'> {}
 
 export default function Clocking(props: IClocking) {
   const {tensorSample} = props.route.params;
+  const arraySample: number[] = JSON.parse(tensorSample);
 
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
@@ -122,26 +123,23 @@ export default function Clocking(props: IClocking) {
           pixelFormat: 'rgb',
           dataType: 'float32',
         });
-        // console.log('arrayBuffer => ', arrayBuffer.byteLength);
         const array: Float32Array = new Float32Array(arrayBuffer);
-        // console.log('array => ', array.length);
         const output = model.runSync([array] as any[]);
-        const arrayTensor = output[0];
-        // console.log(arrayTensor);
-        for (let index = 0; index < arrayTensor.byteLength; index++) {
-          const knownEmb = output[index];
+        const arrayTensor: number[] = [];
+        output[0].map((e: any) => arrayTensor.push(e));
+        // console.log(JSON.stringify(arrayTensor));
+        for (let index = 0; index < arraySample.length; index++) {
           let distance = 0.0;
-          for (let i = 0; i < tensorSample.byteLength; i++) {
-            const diff = tensorSample[i] - knownEmb[i];
+          for (let i = 0; i < arrayTensor.length; i++) {
+            // console.log(arrayTensor[i]);
+            const diff = arrayTensor[i] - arraySample[i];
             distance += diff * diff;
           }
-          console.log('tensorSample => ', tensorSample.length);
-          // console.log('arrayTensor => ', arrayTensor.byteLength);
-          // console.log(
-          //   new Date().toLocaleTimeString(),
-          //   ' distance => ',
-          //   distance,
-          // );
+          console.log(
+            new Date().toLocaleTimeString(),
+            ' distance => ',
+            distance,
+          );
         }
         // const end = performance.now();
         // console.log(`Performance: ${end - start}ms`);

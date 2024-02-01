@@ -20,7 +20,7 @@ export default function Home(props: IHome) {
   const {navigation} = props;
 
   const [faceBase64, setFaceBase64] = useState('');
-  const [tensorSample, setTensorSample] = useState<number[]>([]);
+  const [tensorSample, setTensorSample] = useState<string>('[]');
 
   const fileModel = useTensorflowModel(
     require('../../assets/mobile_face_net.tflite'),
@@ -76,13 +76,11 @@ export default function Home(props: IHome) {
       }
       setFaceBase64(base64Face);
       const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
-      // console.log('arrayBuffer => ', arrayBuffer.byteLength);
       const array: Float32Array = new Float32Array(arrayBuffer);
-      // console.log('array => ', array.length);
       const output = model.runSync([array] as any);
       const arrayTensor: number[] = [];
       output[0].map((e: any) => arrayTensor.push(e));
-      setTensorSample(arrayTensor);
+      setTensorSample(JSON.stringify(arrayTensor));
     }
   };
 
