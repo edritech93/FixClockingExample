@@ -19,11 +19,11 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Worklets, useSharedValue} from 'react-native-worklets-core';
 import {ActivityIndicator, Button, Text} from 'react-native-paper';
 import {useResizePlugin} from 'vision-camera-resize-plugin';
 import {useTensorflowModel} from 'react-native-fast-tflite';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackType} from '../../types/RootStackType';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -42,9 +42,10 @@ export default function Clocking(props: IClocking) {
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
   const [dataCamera, setDataCamera] = useState<string | null>(null);
+  const [distanceFace, setDistanceFace] = useState(0);
 
   const camera = useRef<Camera>(null);
-  const device = useCameraDevice('front', {
+  const device = useCameraDevice('back', {
     physicalDevices: [
       'ultra-wide-angle-camera',
       'wide-angle-camera',
@@ -81,6 +82,9 @@ export default function Clocking(props: IClocking) {
   // const updateFace = Worklets.createRunInJsFn((array: Uint8Array) => {
   //   faceString.value = image;
   // });
+  const updateDistance = Worklets.createRunInJsFn((value: number) => {
+    setDistanceFace(value);
+  });
 
   useEffect(() => {
     async function _getPermission() {
@@ -127,19 +131,13 @@ export default function Clocking(props: IClocking) {
         const output = model.runSync([array] as any[]);
         const arrayTensor: number[] = [];
         output[0].map((e: any) => arrayTensor.push(e));
-        // console.log(JSON.stringify(arrayTensor));
         for (let index = 0; index < arraySample.length; index++) {
           let distance = 0.0;
           for (let i = 0; i < arrayTensor.length; i++) {
-            // console.log(arrayTensor[i]);
-            const diff = arrayTensor[i] - arraySample[i];
+            const diff = arrayTensor[i] - arraySample[i] * -1;
             distance += diff * diff;
           }
-          console.log(
-            new Date().toLocaleTimeString(),
-            ' distance => ',
-            distance,
-          );
+          updateDistance(distance);
         }
         // const end = performance.now();
         // console.log(`Performance: ${end - start}ms`);
@@ -229,6 +227,9 @@ export default function Clocking(props: IClocking) {
           </Button>
         </View>
         <ScrollView>
+          <Text style={styles.textResult}>{`Distance: ${distanceFace.toFixed(
+            2,
+          )}`}</Text>
           <Text style={styles.textResult}>{`Result: ${JSON.stringify(
             tensorFace,
           )}`}</Text>
