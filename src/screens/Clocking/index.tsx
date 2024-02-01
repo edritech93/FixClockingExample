@@ -45,7 +45,7 @@ export default function Clocking(props: IClocking) {
   const [distanceFace, setDistanceFace] = useState(0);
 
   const camera = useRef<Camera>(null);
-  const device = useCameraDevice('back', {
+  const device = useCameraDevice('front', {
     physicalDevices: [
       'ultra-wide-angle-camera',
       'wide-angle-camera',
@@ -58,8 +58,11 @@ export default function Clocking(props: IClocking) {
     {photoResolution: 'max'},
   ]);
   const fps = Math.min(format?.maxFps ?? 1, targetFps);
+  const fileModel = useTensorflowModel(
+    require('../../assets/mobile_face_net.tflite'),
+  );
+  const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
   const {resize} = useResizePlugin();
-  // const faceString = useSharedValue<string>('');
   const rectWidth = useSharedValue(100); // rect width
   const rectHeight = useSharedValue(100); // rect height
   const rectX = useSharedValue(100); // rect x position
@@ -68,11 +71,6 @@ export default function Clocking(props: IClocking) {
   const rectHeightR = useSharedValueR(100); // rect height
   const rectXR = useSharedValueR(0); // rect x position
   const rectYR = useSharedValueR(0); // rect y position
-  const fileModel = useTensorflowModel(
-    require('../../assets/mobile_face_net.tflite'),
-  );
-  const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
-
   const updateRect = Worklets.createRunInJsFn((frame: any) => {
     rectWidthR.value = frame.width;
     rectHeightR.value = frame.height;
@@ -99,7 +97,6 @@ export default function Clocking(props: IClocking) {
       'worklet';
       // const start = performance.now();
       const dataFace: FaceType = scanFaces(frame);
-      // console.log('dataFace => ', dataFace);
       // NOTE: handle face detection
       if (model && dataFace && dataFace.bounds) {
         const {width: frameWidth, height: frameHeight} = frame;
@@ -134,7 +131,7 @@ export default function Clocking(props: IClocking) {
         for (let index = 0; index < arraySample.length; index++) {
           let distance = 0.0;
           for (let i = 0; i < arrayTensor.length; i++) {
-            const diff = arrayTensor[i] - arraySample[i] * -1;
+            const diff = arrayTensor[i] - arraySample[i];
             distance += diff * diff;
           }
           updateDistance(distance);
@@ -248,8 +245,6 @@ export default function Clocking(props: IClocking) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   textResult: {
     color: 'black',
@@ -260,6 +255,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     gap: 16,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   imgPreview: {
     width: SCREEN_WIDTH,
