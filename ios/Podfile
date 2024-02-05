@@ -68,6 +68,8 @@ target 'FixClockingExample' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  $EnableCoreMLDelegate=true
+
   target 'FixClockingExampleTests' do
     inherit! :complete
     # Pods for testing
