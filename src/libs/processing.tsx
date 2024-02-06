@@ -1,11 +1,23 @@
 const lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
 
 export function decodeBase64(base64: string): ArrayBuffer {
-  let p = 0;
-  let encoded1, encoded2, encoded3, encoded4;
-  const arraybuffer = new ArrayBuffer(150528);
-  let bytes = new Uint8Array(arraybuffer);
-  for (let i = 0; i < base64.length; i += 4) {
+  var bufferLength = 150528,
+    len = 150528 / 4,
+    i,
+    p = 0,
+    encoded1,
+    encoded2,
+    encoded3,
+    encoded4;
+  if (base64[base64.length - 1] === '=') {
+    bufferLength--;
+    if (base64[base64.length - 2] === '=') {
+      bufferLength--;
+    }
+  }
+  var arraybuffer = new ArrayBuffer(bufferLength),
+    bytes = new Uint8Array(arraybuffer);
+  for (i = 0; i < len; i += 4) {
     encoded1 = lookup[base64.charCodeAt(i)];
     encoded2 = lookup[base64.charCodeAt(i + 1)];
     encoded3 = lookup[base64.charCodeAt(i + 2)];
