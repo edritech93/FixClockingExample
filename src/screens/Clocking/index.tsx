@@ -60,6 +60,7 @@ export default function Clocking(props: IClocking) {
   const fps = Math.min(format?.maxFps ?? 1, targetFps);
   const fileModel = useTensorflowModel(
     require('../../assets/mobile_face_net.tflite'),
+    'core-ml',
   );
   const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
   const {resize} = useResizePlugin();
@@ -77,9 +78,6 @@ export default function Clocking(props: IClocking) {
     rectXR.value = frame.x;
     rectYR.value = frame.y;
   });
-  // const updateFace = Worklets.createRunInJsFn((array: Uint8Array) => {
-  //   faceString.value = image;
-  // });
   const updateDistance = Worklets.createRunInJsFn((value: number) => {
     setDistanceFace(value);
   });
@@ -115,9 +113,13 @@ export default function Clocking(props: IClocking) {
         });
         // NOTE: handle resize frame
         const arrayBuffer = resize(frame, {
-          size: {
+          crop: {
             x: rectX.value,
             y: rectY.value,
+            width: 112,
+            height: 112,
+          },
+          scale: {
             width: 112,
             height: 112,
           },

@@ -8,10 +8,11 @@ import {
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {detectFromBase64} from 'vision-camera-face-detection';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {useTensorflowModel} from 'react-native-fast-tflite';
+import {loadTensorflowModel} from 'react-native-fast-tflite';
 import {RootStackType} from '../../types/RootStackType';
-import {decodeBase64} from '../../libs/processing';
+import {decodeBase64, resizeFloat32} from '../../libs/processing';
 import {Button} from 'react-native-paper';
+import {decode} from 'base64-arraybuffer';
 
 interface IHome extends NativeStackScreenProps<RootStackType, 'Home'> {}
 
@@ -19,12 +20,9 @@ export default function Home(props: IHome) {
   const {navigation} = props;
 
   const [faceBase64, setFaceBase64] = useState('');
-  const [tensorSample, setTensorSample] = useState<string>('[]');
-
-  const fileModel = useTensorflowModel(
-    require('../../assets/mobile_face_net.tflite'),
-  );
-  const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
+  const [faceBase64R, setFaceBase64R] = useState('');
+  const [tensorSample, setTensorSample] = useState<number[]>([]);
+  const [tensorR, setTensorR] = useState<number[]>([]);
 
   useEffect(() => {
     async function _getPermission() {
@@ -45,6 +43,9 @@ export default function Home(props: IHome) {
   }, []);
 
   const _onOpenImage = async () => {
+    const model = await loadTensorflowModel(
+      require('../../assets/mobile_face_net.tflite'),
+    );
     await getPermissionReadStorage().catch((error: Error) => {
       console.log(error);
       return;
@@ -75,22 +76,79 @@ export default function Home(props: IHome) {
       }
       setFaceBase64(base64Face);
       const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
-      const array: Float32Array = new Float32Array(arrayBuffer);
+      const array: Float32Array = new Float32Array(
+        resizeFloat32(arrayBuffer, 150528),
+      );
       const output = model.runSync([array] as any);
       const arrayTensor: number[] = [];
       output[0].map((e: any) => arrayTensor.push(e));
-      setTensorSample(JSON.stringify(arrayTensor));
+      setTensorSample(arrayTensor);
+      console.log('arrayTensor => ', arrayTensor);
     }
   };
 
-  useEffect(() => {
-    console.log('tensorSample => ', tensorSample);
-  }, [tensorSample]);
+  const _onOpenImageR = async () => {
+    const model = await loadTensorflowModel(
+      require('../../assets/mobile_face_net.tflite'),
+    );
+    await getPermissionReadStorage().catch((error: Error) => {
+      console.log(error);
+      return;
+    });
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: true,
+    }).catch(error => {
+      console.log(error);
+      return;
+    });
+    if (
+      result &&
+      result.assets &&
+      result.assets.length > 0 &&
+      result.assets[0]?.uri &&
+      result.assets[0]?.base64 &&
+      model
+    ) {
+      const base64Face = await detectFromBase64(result.assets[0].base64).catch(
+        (error: Error) => {
+          console.log(error);
+          return;
+        },
+      );
+      if (!base64Face) {
+        return;
+      }
+      setFaceBase64R(base64Face);
+      const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
+      const array: Float32Array = new Float32Array(
+        resizeFloat32(arrayBuffer, 150528),
+      );
+      const output = model.runSync([array] as any);
+      const arrayTensor: number[] = [];
+      output[0].map((e: any) => arrayTensor.push(e));
+      setTensorR(arrayTensor);
+      console.log('arrayTensor => ', arrayTensor);
+    }
+  };
+
+  function _onTensor() {
+    console.log('tensorSample => ', tensorSample.length);
+    console.log('tensorR => ', tensorR.length);
+    for (let index = 0; index < tensorSample.length; index++) {
+      let distance = 0.0;
+      for (let i = 0; i < tensorR.length; i++) {
+        const diff = tensorR[i] - tensorSample[i];
+        distance += diff * diff;
+      }
+      console.log(`${new Date().toTimeString()} = `, distance);
+    }
+  }
 
   return (
     <View style={styles.container}>
       <Button mode={'contained'} onPress={_onOpenImage}>
-        Open Image
+        Add Image Sample
       </Button>
       {faceBase64.length > 0 && (
         <Image
@@ -98,10 +156,26 @@ export default function Home(props: IHome) {
           style={styles.imgFace}
         />
       )}
+      <Button mode={'contained'} onPress={_onOpenImageR}>
+        Add Image R
+      </Button>
+      {faceBase64R.length > 0 && (
+        <Image
+          source={{uri: `data:image/png;base64,${faceBase64R}`}}
+          style={styles.imgFace}
+        />
+      )}
+      <Button
+        mode={'contained'}
+        onPress={() => _onTensor()}
+        // onPress={() => navigation.push('Clocking', {tensorSample})}
+      >
+        Test Clocking
+      </Button>
       <Button
         mode={'contained'}
         onPress={() => navigation.push('Clocking', {tensorSample})}>
-        Test Clocking
+        Goto Clocking
       </Button>
     </View>
   );
