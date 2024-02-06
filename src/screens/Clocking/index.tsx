@@ -127,9 +127,11 @@ export default function Clocking(props: IClocking) {
           dataType: 'float32',
         });
         const array: Float32Array = new Float32Array(arrayBuffer);
+        // console.log('array => ', array);
         const output = model.runSync([array] as any[]);
-        const arrayTensor: number[] = [];
-        output[0].map((e: any) => arrayTensor.push(e));
+        console.log('output => ', output);
+        // const arrayTensor: number[] = [];
+        // output[0].map((e: any) => arrayTensor.push(e));
         // for (let index = 0; index < arraySample.length; index++) {
         //   let distance = 0.0;
         //   for (let i = 0; i < arrayTensor.length; i++) {

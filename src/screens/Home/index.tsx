@@ -8,7 +8,10 @@ import {
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {detectFromBase64} from 'vision-camera-face-detection';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {loadTensorflowModel} from 'react-native-fast-tflite';
+import {
+  loadTensorflowModel,
+  useTensorflowModel,
+} from 'react-native-fast-tflite';
 import {RootStackType} from '../../types/RootStackType';
 import {base64ToFloat32Array, decodeBase64} from '../../libs/processing';
 import {Button} from 'react-native-paper';
@@ -23,6 +26,12 @@ export default function Home(props: IHome) {
   const [faceBase64R, setFaceBase64R] = useState('');
   const [tensorSample, setTensorSample] = useState<number[]>([]);
   const [tensorR, setTensorR] = useState<number[]>([]);
+
+  const fileModel = useTensorflowModel(
+    require('../../assets/mobile_face_net.tflite'),
+    'core-ml',
+  );
+  const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
 
   useEffect(() => {
     async function _getPermission() {
@@ -43,9 +52,10 @@ export default function Home(props: IHome) {
   }, []);
 
   const _onOpenImage = async () => {
-    const model = await loadTensorflowModel(
-      require('../../assets/mobile_face_net.tflite'),
-    );
+    // const model = await loadTensorflowModel(
+    //   require('../../assets/mobile_face_net.tflite'),
+    //   'core-ml',
+    // );
     await getPermissionReadStorage().catch((error: Error) => {
       console.log(error);
       return;
@@ -86,9 +96,10 @@ export default function Home(props: IHome) {
   };
 
   const _onOpenImageR = async () => {
-    const model = await loadTensorflowModel(
-      require('../../assets/mobile_face_net.tflite'),
-    );
+    // const model = await loadTensorflowModel(
+    //   require('../../assets/mobile_face_net.tflite'),
+    //   'core-ml',
+    // );
     await getPermissionReadStorage().catch((error: Error) => {
       console.log(error);
       return;
@@ -189,3 +200,6 @@ const styles = StyleSheet.create({
     width: 112,
   },
 });
+
+// Byte Length for model mobile_face_net.tflite
+// 150528

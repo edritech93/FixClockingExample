@@ -60,6 +60,6 @@ export function base64ToFloat32Array(base64: string): Float32Array {
     dView.setUint8(3, blob.charCodeAt(p + 3));
     fAry[j] = dView.getFloat32(0, true);
   }
-  console.log('fAry => ', fAry);
+  console.log('fAry => ', fAry.byteLength);
   return fAry;
 }
