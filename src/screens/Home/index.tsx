@@ -77,10 +77,11 @@ export default function Home(props: IHome) {
       setFaceBase64(base64Face);
       const array: Float32Array = base64ToFloat32Array(base64Face);
       const output = model.runSync([array] as any);
-      const arrayTensor: number[] = [];
-      output[0].map((e: any) => arrayTensor.push(e));
-      setTensorSample(arrayTensor);
-      console.log('arrayTensor => ', arrayTensor);
+      console.log('output => ', output);
+      // const arrayTensor: number[] = [];
+      // output[0].map((e: any) => arrayTensor.push(e));
+      // setTensorSample(arrayTensor);
+      // console.log('arrayTensor => ', arrayTensor);
     }
   };
 
@@ -119,10 +120,11 @@ export default function Home(props: IHome) {
       setFaceBase64R(base64Face);
       const array: Float32Array = base64ToFloat32Array(base64Face);
       const output = model.runSync([array] as any);
-      const arrayTensor: number[] = [];
-      output[0].map((e: any) => arrayTensor.push(e));
-      setTensorR(arrayTensor);
-      console.log('arrayTensor => ', arrayTensor);
+      console.log('output => ', output);
+      // const arrayTensor: number[] = [];
+      // output[0].map((e: any) => arrayTensor.push(e));
+      // setTensorR(arrayTensor);
+      // console.log('arrayTensor => ', arrayTensor);
     }
   };
 

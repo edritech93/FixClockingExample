@@ -46,7 +46,7 @@ export function resizeFloat32(
 
 export function base64ToFloat32Array(base64: string): Float32Array {
   const blob = atob(base64);
-  const fLen = blob.length / Float32Array.BYTES_PER_ELEMENT;
+  const fLen = 150528 / Float32Array.BYTES_PER_ELEMENT;
   console.log('fLen => ', fLen);
   const dView = new DataView(new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT));
   let fAry = new Float32Array(fLen);
@@ -60,5 +60,6 @@ export function base64ToFloat32Array(base64: string): Float32Array {
     dView.setUint8(3, blob.charCodeAt(p + 3));
     fAry[j] = dView.getFloat32(0, true);
   }
+  console.log('fAry => ', fAry);
   return fAry;
 }
