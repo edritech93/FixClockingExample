@@ -43,3 +43,22 @@ export function resizeFloat32(
 
   return resizedArrayBuffer;
 }
+
+export function base64ToFloat32Array(base64: string): Float32Array {
+  let blob = atob(base64), // Base64 string converted to a char array
+    fLen = blob.length / Float32Array.BYTES_PER_ELEMENT, // How many floats can be made, but be even
+    dView = new DataView(new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT)), // ArrayBuffer/DataView to convert 4 bytes into 1 float.
+    fAry = new Float32Array(fLen), // Final Output at the correct size
+    p = 0; // Position
+
+  for (let j = 0; j < fLen; j++) {
+    p = j * 4;
+    dView.setUint8(0, blob.charCodeAt(p));
+    dView.setUint8(1, blob.charCodeAt(p + 1));
+    dView.setUint8(2, blob.charCodeAt(p + 2));
+    dView.setUint8(3, blob.charCodeAt(p + 3));
+    fAry[j] = dView.getFloat32(0, true);
+  }
+  console.log(fAry);
+  return fAry;
+}

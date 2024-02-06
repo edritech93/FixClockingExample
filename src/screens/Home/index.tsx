@@ -10,7 +10,7 @@ import {detectFromBase64} from 'vision-camera-face-detection';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {loadTensorflowModel} from 'react-native-fast-tflite';
 import {RootStackType} from '../../types/RootStackType';
-import {decodeBase64, resizeFloat32} from '../../libs/processing';
+import {base64ToFloat32Array, decodeBase64} from '../../libs/processing';
 import {Button} from 'react-native-paper';
 import {decode} from 'base64-arraybuffer';
 
@@ -75,10 +75,7 @@ export default function Home(props: IHome) {
         return;
       }
       setFaceBase64(base64Face);
-      const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
-      const array: Float32Array = new Float32Array(
-        resizeFloat32(arrayBuffer, 150528),
-      );
+      const array: Float32Array = base64ToFloat32Array(base64Face);
       const output = model.runSync([array] as any);
       const arrayTensor: number[] = [];
       output[0].map((e: any) => arrayTensor.push(e));
@@ -120,10 +117,7 @@ export default function Home(props: IHome) {
         return;
       }
       setFaceBase64R(base64Face);
-      const arrayBuffer: ArrayBuffer = decodeBase64(base64Face);
-      const array: Float32Array = new Float32Array(
-        resizeFloat32(arrayBuffer, 150528),
-      );
+      const array: Float32Array = base64ToFloat32Array(base64Face);
       const output = model.runSync([array] as any);
       const arrayTensor: number[] = [];
       output[0].map((e: any) => arrayTensor.push(e));

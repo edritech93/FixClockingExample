@@ -37,7 +37,7 @@ interface IClocking extends NativeStackScreenProps<RootStackType, 'Clocking'> {}
 
 export default function Clocking(props: IClocking) {
   const {tensorSample} = props.route.params;
-  const arraySample: number[] = JSON.parse(tensorSample);
+  // const arraySample: number[] = JSON.parse(tensorSample);
 
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
@@ -130,14 +130,14 @@ export default function Clocking(props: IClocking) {
         const output = model.runSync([array] as any[]);
         const arrayTensor: number[] = [];
         output[0].map((e: any) => arrayTensor.push(e));
-        for (let index = 0; index < arraySample.length; index++) {
-          let distance = 0.0;
-          for (let i = 0; i < arrayTensor.length; i++) {
-            const diff = arrayTensor[i] - arraySample[i];
-            distance += diff * diff;
-          }
-          updateDistance(distance);
-        }
+        // for (let index = 0; index < arraySample.length; index++) {
+        //   let distance = 0.0;
+        //   for (let i = 0; i < arrayTensor.length; i++) {
+        //     const diff = arrayTensor[i] - arraySample[i];
+        //     distance += diff * diff;
+        //   }
+        //   updateDistance(distance);
+        // }
         // const end = performance.now();
         // console.log(`Performance: ${end - start}ms`);
       }
