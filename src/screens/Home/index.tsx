@@ -8,14 +8,10 @@ import {
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {detectFromBase64} from 'vision-camera-face-detection';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {
-  loadTensorflowModel,
-  useTensorflowModel,
-} from 'react-native-fast-tflite';
+import {useTensorflowModel} from 'react-native-fast-tflite';
 import {RootStackType} from '../../types/RootStackType';
-import {base64ToFloat32Array, decodeBase64} from '../../libs/processing';
+import {base64ToFloat32Array} from '../../libs/processing';
 import {Button} from 'react-native-paper';
-import {decode} from 'base64-arraybuffer';
 
 interface IHome extends NativeStackScreenProps<RootStackType, 'Home'> {}
 
@@ -52,10 +48,6 @@ export default function Home(props: IHome) {
   }, []);
 
   const _onOpenImage = async () => {
-    // const model = await loadTensorflowModel(
-    //   require('../../assets/mobile_face_net.tflite'),
-    //   'core-ml',
-    // );
     await getPermissionReadStorage().catch((error: Error) => {
       console.log(error);
       return;
@@ -96,10 +88,6 @@ export default function Home(props: IHome) {
   };
 
   const _onOpenImageR = async () => {
-    // const model = await loadTensorflowModel(
-    //   require('../../assets/mobile_face_net.tflite'),
-    //   'core-ml',
-    // );
     await getPermissionReadStorage().catch((error: Error) => {
       console.log(error);
       return;
