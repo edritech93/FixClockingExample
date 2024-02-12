@@ -11,6 +11,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {useTensorflowModel} from 'react-native-fast-tflite';
 import {RootStackType} from '../../types/RootStackType';
 import {base64ToFloat32Array} from '../../libs/processing';
+import {decode} from 'base64-arraybuffer-es6';
 import {Button} from 'react-native-paper';
 
 interface IHome extends NativeStackScreenProps<RootStackType, 'Home'> {}
@@ -74,12 +75,23 @@ export default function Home(props: IHome) {
         },
       );
       if (!base64Face) {
+        console.log('no face');
         return;
       }
-      setFaceBase64(base64Face);
-      const array: Float32Array = base64ToFloat32Array(base64Face);
+      const bufferLength = 112;
+      const arrayBuffer: ArrayBuffer = decode(base64Face, {
+        maxByteLength: bufferLength,
+      });
+      console.log('arrayBuffer.byteLength => ', arrayBuffer.byteLength);
+      const array = new Float32Array(arrayBuffer, 0, bufferLength);
+      console.log('array => ', array.buffer.byteLength);
       const output = model.runSync([array] as any);
       console.log('output => ', output);
+
+      // setFaceBase64(base64Face);
+      // const array: Float32Array = base64ToFloat32Array(base64Face);
+      // const output = model.runSync([array] as any);
+      // console.log('output => ', output);
       // const arrayTensor: number[] = [];
       // output[0].map((e: any) => arrayTensor.push(e));
       // setTensorSample(arrayTensor);
@@ -114,6 +126,7 @@ export default function Home(props: IHome) {
         },
       );
       if (!base64Face) {
+        console.log('no face');
         return;
       }
       setFaceBase64R(base64Face);
