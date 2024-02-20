@@ -72,7 +72,8 @@ export default function Home(props: IHome) {
           return;
         },
       );
-      console.log('objFace1 => ', objFace1);
+      // console.log('objFace1 => ', objFace1);
+      setTensorData1(objFace1.data);
     }
   };
 
@@ -103,12 +104,14 @@ export default function Home(props: IHome) {
           return;
         },
       );
-      console.log('objFace2 => ', objFace2);
+      // console.log('objFace2 => ', objFace2);
+      setTensorData2(objFace2.data);
     }
   };
 
   function _onTensor() {
-    for (let index = 0; index < tensorData1.length; index++) {
+    const totalFaceSaved = 1; //example 1 face is saved
+    for (let index = 0; index < totalFaceSaved; index++) {
       let distance = 0.0;
       for (let i = 0; i < tensorData2.length; i++) {
         const diff = tensorData2[i] - tensorData1[i];

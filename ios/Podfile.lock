@@ -998,6 +998,10 @@ PODS:
   - React-Mapbuffer (0.73.4):
     - glog
     - React-debug
+  - react-native-fast-tflite (1.2.0):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
   - react-native-image-picker (7.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1194,6 +1198,11 @@ PODS:
     - TensorFlowLiteSwift/Core (= 2.11.0)
   - TensorFlowLiteSwift/Core (2.11.0):
     - TensorFlowLiteC (= 2.11.0)
+  - vision-camera-resize-plugin (2.0.1):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+    - VisionCamera
   - VisionCamera (3.9.0):
     - React
     - React-callinvoker
@@ -1261,6 +1270,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-fast-tflite (from `../node_modules/react-native-fast-tflite`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-worklets-core (from `../node_modules/react-native-worklets-core`)
@@ -1287,6 +1297,7 @@ DEPENDENCIES:
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - vision-camera-resize-plugin (from `../node_modules/vision-camera-resize-plugin`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - VisionCameraFaceDetection (from `../node_modules/vision-camera-face-detection`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1377,6 +1388,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-fast-tflite:
+    :path: "../node_modules/react-native-fast-tflite"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-safe-area-context:
@@ -1429,6 +1442,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  vision-camera-resize-plugin:
+    :path: "../node_modules/vision-camera-resize-plugin"
   VisionCamera:
     :path: "../node_modules/react-native-vision-camera"
   VisionCameraFaceDetection:
@@ -1488,6 +1503,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 9ac353eccf6ab54d1e0a33862ba91221d1e88460
   React-logger: 0a57b68dd2aec7ff738195f081f0520724b35dab
   React-Mapbuffer: 63913773ed7f96b814a2521e13e6d010282096ad
+  react-native-fast-tflite: a9574c72f0d3e9efb916953926d089f65326c66b
   react-native-image-picker: 6c51359eca7a7df9f07e297218c25696eb9da976
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   react-native-worklets-core: a894d572639fcf37c6d284cc799882d25d00c93d
@@ -1517,6 +1533,7 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   TensorFlowLiteC: 8a8cb6fa20ad74dff29b5e490d02c36a14d48148
   TensorFlowLiteSwift: 1a5cd776a377f8d7a009b16f5904fdf91a8debfa
+  vision-camera-resize-plugin: 536345c29f42e04438d34d0cada7b4992a8fc104
   VisionCamera: 72ec2908dff5de402074d0cfd41932cd33c1fe65
   VisionCameraFaceDetection: fb10f8886df42d6b82a9d1592d575dc1ac1b7126
   Yoga: 1b901a6d6eeba4e8a2e8f308f708691cdb5db312
