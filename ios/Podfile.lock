@@ -998,7 +998,7 @@ PODS:
   - React-Mapbuffer (0.73.4):
     - glog
     - React-debug
-  - react-native-fast-tflite (1.1.3):
+  - react-native-fast-tflite (1.2.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1179,9 +1179,9 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNPermissions (4.1.1):
+  - RNPermissions (4.1.2):
     - React-Core
-  - RNReanimated (3.6.2):
+  - RNReanimated (3.7.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1191,12 +1191,19 @@ PODS:
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
   - SocketRocket (0.6.1)
+  - TensorFlowLiteC (2.11.0):
+    - TensorFlowLiteC/Core (= 2.11.0)
+  - TensorFlowLiteC/Core (2.11.0)
+  - TensorFlowLiteSwift (2.11.0):
+    - TensorFlowLiteSwift/Core (= 2.11.0)
+  - TensorFlowLiteSwift/Core (2.11.0):
+    - TensorFlowLiteC (= 2.11.0)
   - vision-camera-resize-plugin (2.0.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - VisionCamera
-  - VisionCamera (3.8.2):
+  - VisionCamera (3.9.0):
     - React
     - React-callinvoker
     - React-Core
@@ -1206,6 +1213,7 @@ PODS:
     - GoogleMLKit/FaceDetection
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
+    - TensorFlowLiteSwift (= 2.11.0)
     - VisionCamera
   - Yoga (1.14.0)
 
@@ -1321,6 +1329,8 @@ SPEC REPOS:
     - OpenSSL-Universal
     - PromisesObjC
     - SocketRocket
+    - TensorFlowLiteC
+    - TensorFlowLiteSwift
 
 EXTERNAL SOURCES:
   boost:
@@ -1493,7 +1503,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 9ac353eccf6ab54d1e0a33862ba91221d1e88460
   React-logger: 0a57b68dd2aec7ff738195f081f0520724b35dab
   React-Mapbuffer: 63913773ed7f96b814a2521e13e6d010282096ad
-  react-native-fast-tflite: 369d7ded6d82a878fb481ab772c26804a2a797f0
+  react-native-fast-tflite: a9574c72f0d3e9efb916953926d089f65326c66b
   react-native-image-picker: 6c51359eca7a7df9f07e297218c25696eb9da976
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   react-native-worklets-core: a894d572639fcf37c6d284cc799882d25d00c93d
@@ -1517,13 +1527,15 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
-  RNPermissions: f18c61c418a3f6e7ed79d2ad145551685e3b614a
-  RNReanimated: 5589be82dc26b3f94738eb7c6b1f942787532b25
+  RNPermissions: 4288a93f8d026d27ebb87bd3e75bd5e746fe6c36
+  RNReanimated: 7d6d32f238f914f13d9d6fb45c0aef557f7f901e
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  TensorFlowLiteC: 8a8cb6fa20ad74dff29b5e490d02c36a14d48148
+  TensorFlowLiteSwift: 1a5cd776a377f8d7a009b16f5904fdf91a8debfa
   vision-camera-resize-plugin: 536345c29f42e04438d34d0cada7b4992a8fc104
-  VisionCamera: edbcd00e27a438b2228f67823e2b8d15a189065f
-  VisionCameraFaceDetection: 1c82c6d75860968a04904fac78d0484bd350fc24
+  VisionCamera: 72ec2908dff5de402074d0cfd41932cd33c1fe65
+  VisionCameraFaceDetection: fb10f8886df42d6b82a9d1592d575dc1ac1b7126
   Yoga: 1b901a6d6eeba4e8a2e8f308f708691cdb5db312
 
 PODFILE CHECKSUM: a3568e003dcb7b6da2bfa9d0b996dcea81cb186b
