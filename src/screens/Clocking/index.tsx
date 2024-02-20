@@ -8,6 +8,7 @@ import {
   useCameraFormat,
   useCameraDevice,
   type PhotoFile,
+  runAtTargetFps,
 } from 'react-native-vision-camera';
 import {
   scanFaces,
@@ -37,7 +38,6 @@ interface IClocking extends NativeStackScreenProps<RootStackType, 'Clocking'> {}
 
 export default function Clocking(props: IClocking) {
   const {tensorSample} = props.route.params;
-  // const arraySample: number[] = JSON.parse(tensorSample);
 
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [tensorFace, setTensorFace] = useState<number[]>([]);
@@ -60,7 +60,6 @@ export default function Clocking(props: IClocking) {
   const fps = Math.min(format?.maxFps ?? 1, targetFps);
   const fileModel = useTensorflowModel(
     require('../../assets/mobile_face_net.tflite'),
-    'core-ml',
   );
   const model = fileModel.state === 'loaded' ? fileModel.model : undefined;
   const {resize} = useResizePlugin();
@@ -93,56 +92,54 @@ export default function Clocking(props: IClocking) {
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
       'worklet';
-      // const start = performance.now();
-      const dataFace: FaceType = scanFaces(frame);
-      // NOTE: handle face detection
-      if (model && dataFace && dataFace.bounds) {
-        const {width: frameWidth, height: frameHeight} = frame;
-        const xFactor = SCREEN_WIDTH / frameWidth;
-        const yFactor = SCREEN_HEIGHT / frameHeight;
-        const bounds: FaceBoundType = dataFace.bounds;
-        rectWidth.value = bounds.width * xFactor;
-        rectHeight.value = bounds.height * yFactor;
-        rectX.value = bounds.x * xFactor;
-        rectY.value = bounds.y * yFactor;
-        updateRect({
-          width: rectWidth.value,
-          height: rectHeight.value,
-          x: rectX.value,
-          y: rectY.value,
-        });
-        // NOTE: handle resize frame
-        const arrayBuffer = resize(frame, {
-          crop: {
+      runAtTargetFps(1, () => {
+        const dataFace: FaceType = scanFaces(frame);
+        // NOTE: handle face detection
+        if (model && dataFace && dataFace.bounds) {
+          const {width: frameWidth, height: frameHeight} = frame;
+          const xFactor = SCREEN_WIDTH / frameWidth;
+          const yFactor = SCREEN_HEIGHT / frameHeight;
+          const bounds: FaceBoundType = dataFace.bounds;
+          rectWidth.value = bounds.width * xFactor;
+          rectHeight.value = bounds.height * yFactor;
+          rectX.value = bounds.x * xFactor;
+          rectY.value = bounds.y * yFactor;
+          updateRect({
+            width: rectWidth.value,
+            height: rectHeight.value,
             x: rectX.value,
             y: rectY.value,
-            width: 112,
-            height: 112,
-          },
-          scale: {
-            width: 112,
-            height: 112,
-          },
-          pixelFormat: 'rgb',
-          dataType: 'float32',
-        });
-        const array: Float32Array = new Float32Array(arrayBuffer);
-        // console.log('array => ', array);
-        const output = model.runSync([array] as any[]);
-        console.log('output => ', output);
-        // const arrayTensor: number[] = [];
-        // output[0].map((e: any) => arrayTensor.push(e));
-        // for (let index = 0; index < arraySample.length; index++) {
-        //   let distance = 0.0;
-        //   for (let i = 0; i < arrayTensor.length; i++) {
-        //     const diff = arrayTensor[i] - arraySample[i];
-        //     distance += diff * diff;
-        //   }
-        //   updateDistance(distance);
-        // }
-        // const end = performance.now();
-        // console.log(`Performance: ${end - start}ms`);
-      }
+          });
+          // NOTE: handle resize frame
+          const arrayBuffer = resize(frame, {
+            crop: {
+              x: rectX.value,
+              y: rectY.value,
+              width: 112,
+              height: 112,
+            },
+            scale: {
+              width: 112,
+              height: 112,
+            },
+            pixelFormat: 'rgb',
+            dataType: 'float32',
+          });
+          const array: Float32Array = new Float32Array(arrayBuffer);
+          const output = model.runSync([array] as any[]);
+          // console.log('output => ', output.length);
+          const arrayTensor: any = output[0].map((e: any) => e);
+          const totalFaceSaved = 1; //example 1 face is saved
+          for (let index = 0; index < totalFaceSaved; index++) {
+            let distance = 0.0;
+            for (let i = 0; i < output.length; i++) {
+              const diff = arrayTensor[i] - tensorSample[i];
+              distance += diff * diff;
+            }
+            console.log(`${new Date().toTimeString()} = `, distance);
+          }
+        }
+      });
     },
     [model],
   );

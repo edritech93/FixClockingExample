@@ -14,6 +14,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-FixClockingExample-FixClockingExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-FixClockingExample-FixClockingExampleTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		D4122C442B848A7A00DAC0E6 /* mobile_face_net.tflite in Resources */ = {isa = PBXBuildFile; fileRef = D4122C422B848A7900DAC0E6 /* mobile_face_net.tflite */; };
+		D4122C452B848A7A00DAC0E6 /* labelmap.txt in Resources */ = {isa = PBXBuildFile; fileRef = D4122C432B848A7900DAC0E6 /* labelmap.txt */; };
 		D4B56BEF2B70AC3A00AA78E3 /* CoreML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4B56BEE2B70AC3A00AA78E3 /* CoreML.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +46,8 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-FixClockingExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FixClockingExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = FixClockingExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-FixClockingExample-FixClockingExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FixClockingExample-FixClockingExampleTests.release.xcconfig"; path = "Target Support Files/Pods-FixClockingExample-FixClockingExampleTests/Pods-FixClockingExample-FixClockingExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		D4122C422B848A7900DAC0E6 /* mobile_face_net.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; name = mobile_face_net.tflite; path = FixClockingExample/mobile_face_net.tflite; sourceTree = "<group>"; };
+		D4122C432B848A7900DAC0E6 /* labelmap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = labelmap.txt; path = FixClockingExample/labelmap.txt; sourceTree = "<group>"; };
 		D4B56BEE2B70AC3A00AA78E3 /* CoreML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreML.framework; path = System/Library/Frameworks/CoreML.framework; sourceTree = SDKROOT; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -89,6 +93,8 @@
 		13B07FAE1A68108700A75B9A /* FixClockingExample */ = {
 			isa = PBXGroup;
 			children = (
+				D4122C432B848A7900DAC0E6 /* labelmap.txt */,
+				D4122C422B848A7900DAC0E6 /* mobile_face_net.tflite */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -245,6 +251,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4122C452B848A7A00DAC0E6 /* labelmap.txt in Resources */,
+				D4122C442B848A7A00DAC0E6 /* mobile_face_net.tflite in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
