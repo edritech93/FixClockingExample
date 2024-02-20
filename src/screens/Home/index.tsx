@@ -6,7 +6,7 @@ import {
   getPermissionWriteStorage,
 } from '../../libs/permission';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {detectFromBase64} from 'vision-camera-face-detection';
+import {detectFromBase64, initTensor} from 'vision-camera-face-detection';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {RootStackType} from '../../types/RootStackType';
 import {Button} from 'react-native-paper';
@@ -37,6 +37,12 @@ export default function Home(props: IHome) {
       });
     }
     _getPermission();
+  }, []);
+
+  useEffect(() => {
+    initTensor('mobile_face_net', 1)
+      .then(response => console.log(response))
+      .catch(error => console.log(error));
   }, []);
 
   const _onOpenSample1 = async () => {
