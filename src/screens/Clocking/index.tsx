@@ -77,8 +77,9 @@ export default function Clocking(props: IClocking) {
     rectXR.value = frame.x;
     rectYR.value = frame.y;
   });
-  const updateDistance = Worklets.createRunInJsFn((value: number) => {
-    setDistanceFace(value);
+  const updateDistance = Worklets.createRunInJsFn(({distance, data}) => {
+    setDistanceFace(distance);
+    setTensorFace(data);
   });
 
   useEffect(() => {
@@ -132,11 +133,11 @@ export default function Clocking(props: IClocking) {
           const totalFaceSaved = 1; //example 1 face is saved
           for (let index = 0; index < totalFaceSaved; index++) {
             let distance = 0.0;
-            for (let i = 0; i < output.length; i++) {
+            for (let i = 0; i < arrayTensor.length; i++) {
               const diff = arrayTensor[i] - tensorSample[i];
               distance += diff * diff;
             }
-            console.log(`${new Date().toTimeString()} = `, distance);
+            updateDistance({distance, data: arrayTensor});
           }
         }
       });
@@ -224,7 +225,7 @@ export default function Clocking(props: IClocking) {
             Clear Data
           </Button>
         </View>
-        <ScrollView>
+        <ScrollView style={styles.wrapScroll}>
           <Text style={styles.textResult}>{`Distance: ${distanceFace.toFixed(
             2,
           )}`}</Text>
@@ -250,6 +251,9 @@ const styles = StyleSheet.create({
   textResult: {
     color: 'black',
     marginHorizontal: 8,
+  },
+  wrapScroll: {
+    marginBottom: 200,
   },
   wrapBottom: {
     flexDirection: 'row',
