@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View, Text} from 'react-native';
 import {
   getPermissionCamera,
   getPermissionReadStorage,
   getPermissionWriteStorage,
 } from '../../libs/permission';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {detectFromBase64, initTensor} from 'vision-camera-face-detection';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {RootStackType} from '../../types/RootStackType';
 import {Button} from 'react-native-paper';
@@ -20,6 +20,7 @@ export default function Home(props: IHome) {
   const [faceSample2, setFaceSample2] = useState('');
   const [tensorData1, setTensorData1] = useState<number[]>([]);
   const [tensorData2, setTensorData2] = useState<number[]>([]);
+  const [distanceFace, setDistanceFace] = useState<string>('');
 
   useEffect(() => {
     async function _getPermission() {
@@ -117,7 +118,7 @@ export default function Home(props: IHome) {
         const diff = tensorData2[i] - tensorData1[i];
         distance += diff * diff;
       }
-      console.log(`${new Date().toTimeString()} = `, distance);
+      setDistanceFace(distance.toString());
     }
   }
 
@@ -145,6 +146,7 @@ export default function Home(props: IHome) {
         <Button mode={'contained'} onPress={() => _onTensor()}>
           Do Tensor
         </Button>
+        <Text>{`Distance: ${distanceFace}`}</Text>
       </View>
       <Button
         mode={'contained'}
@@ -171,6 +173,3 @@ const styles = StyleSheet.create({
     width: 112,
   },
 });
-
-// Byte Length for model mobile_face_net.tflite
-// 150528
